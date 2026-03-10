@@ -1,65 +1,189 @@
-import Image from "next/image";
+/**
+ * ホームページコンポーネント
+ * betterAuthを使用した認証機能（登録・ログイン・ログアウト）を提供
+ */
+"use client";
+
+import { useState } from "react";
+import { authClient } from "@/lib/auth-client";
 
 export default function Home() {
+  // セッション情報を取得
+  // data: 現在のセッションデータ、isPending: 読み込み状態、refetch: セッション再取得関数
+  const { data: session, isPending, refetch } = authClient.useSession();
+
+  // 新規登録フォームの状態管理
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  // ログインフォームの状態管理
+  const [loginEmail, setLoginEmail] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
+
+  // メッセージ表示用の状態管理（成功・失敗メッセージ）
+  const [message, setMessage] = useState("");
+
+  /**
+   * 新規登録処理
+   * メール・パスワードで新規ユーザーを作成
+   */
+  const handleSignUp = async () => {
+    setMessage(""); // メッセージをクリア
+
+    // authClientを使用してメール登録を実行
+    const { error } = await authClient.signUp.email({
+      name,
+      email,
+      password,
+    });
+
+    // エラーハンドリング
+    if (error) {
+      setMessage(`登録失敗: ${error.message ?? "unknown error"}`);
+      return;
+    }
+
+    // 成功時はメッセージを表示してセッション情報を再取得
+    setMessage("登録成功");
+    await refetch();
+  };
+
+  /**
+   * ログイン処理
+   * メール・パスワードで既存ユーザーとしてログイン
+   */
+  const handleSignIn = async () => {
+    setMessage(""); // メッセージをクリア
+
+    // authClientを使用してメールログインを実行
+    const { error } = await authClient.signIn.email({
+      email: loginEmail,
+      password: loginPassword,
+    });
+
+    // エラーハンドリング
+    if (error) {
+      setMessage(`ログイン失敗: ${error.message ?? "unknown error"}`);
+      return;
+    }
+
+    // 成功時はメッセージを表示してセッション情報を再取得
+    setMessage("ログイン成功");
+    await refetch();
+  };
+
+  /**
+   * ログアウト処理
+   * 現在のセッションを終了
+   */
+  const handleSignOut = async () => {
+    setMessage(""); // メッセージをクリア
+
+    // authClientを使用してログアウトを実行
+    const { error } = await authClient.signOut();
+
+    // エラーハンドリング
+    if (error) {
+      setMessage(`ログアウト失敗: ${error.message ?? "unknown error"}`);
+      return;
+    }
+
+    // 成功時はメッセージを表示してセッション情報を再取得
+    setMessage("ログアウト成功");
+    await refetch();
+  };
+
+  // セッション読み込み中の表示
+  if (isPending) {
+    return <main className="p-6">読み込み中...</main>;
+  }
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <main className="max-w-2xl mx-auto p-6 space-y-8">
+      <h1 className="text-2xl font-bold">betterAuth 学習アプリ</h1>
+
+      {/* メッセージ表示エリア（成功・失敗メッセージ） */}
+      {message && (
+        <p className="rounded border p-3 text-sm">
+          {message}
+        </p>
+      )}
+
+      {/* セッションの有無で表示を切り替え */}
+      {session ? (
+        // ログイン済みの場合：マイページを表示
+        <section className="space-y-4 rounded border p-4">
+          <h2 className="text-xl font-semibold">マイページ</h2>
+          <p>ログイン中です。</p>
+          <p>名前: {session.user.name}</p>
+          <p>メール: {session.user.email}</p>
+
+          <button
+            onClick={handleSignOut}
+            className="rounded border px-4 py-2"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+            ログアウト
+          </button>
+        </section>
+      ) : (
+        // 未ログインの場合：新規登録とログインフォームを表示
+        <>
+          {/* 新規登録セクション */}
+          <section className="space-y-3 rounded border p-4">
+            <h2 className="text-xl font-semibold">新規登録</h2>
+            <input
+              className="w-full rounded border p-2"
+              placeholder="名前"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+            <input
+              className="w-full rounded border p-2"
+              placeholder="メールアドレス"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <input
+              className="w-full rounded border p-2"
+              placeholder="パスワード"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <button
+              onClick={handleSignUp}
+              className="rounded border px-4 py-2"
+            >
+              登録
+            </button>
+          </section>
+
+          {/* ログインセクション */}
+          <section className="space-y-3 rounded border p-4">
+            <h2 className="text-xl font-semibold">ログイン</h2>
+            <input
+              className="w-full rounded border p-2"
+              placeholder="メールアドレス"
+              value={loginEmail}
+              onChange={(e) => setLoginEmail(e.target.value)}
+            />
+            <input
+              className="w-full rounded border p-2"
+              placeholder="パスワード"
+              type="password"
+              value={loginPassword}
+              onChange={(e) => setLoginPassword(e.target.value)}
+            />
+            <button
+              onClick={handleSignIn}
+              className="rounded border px-4 py-2"
+            >
+              ログイン
+            </button>
+          </section>
+        </>
+      )}
+    </main>
   );
 }
