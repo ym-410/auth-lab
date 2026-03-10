@@ -31,7 +31,8 @@ export default function Home() {
   const handleSignUp = async () => {
     setMessage(""); // メッセージをクリア
 
-    // authClientを使用してメール登録を実行
+    // authClientを使用してメール登録を実行]
+    // 成功したらerror=null 失敗したら情報
     const { error } = await authClient.signUp.email({
       name,
       email,
