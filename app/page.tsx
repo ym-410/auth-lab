@@ -4,8 +4,11 @@
  */
 "use client";
 
+
 import { useState } from "react";
 import { authClient } from "@/lib/auth-client";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function Home() {
   // セッション情報を取得
@@ -23,6 +26,9 @@ export default function Home() {
 
   // メッセージ表示用の状態管理（成功・失敗メッセージ）
   const [message, setMessage] = useState("");
+
+  // router
+  const router = useRouter();
 
   /**
    * 新規登録処理
@@ -48,6 +54,9 @@ export default function Home() {
     // 成功時はメッセージを表示してセッション情報を再取得
     setMessage("登録成功");
     await refetch();
+
+    router.push("/mypage");
+    
   };
 
   /**
@@ -72,6 +81,9 @@ export default function Home() {
     // 成功時はメッセージを表示してセッション情報を再取得
     setMessage("ログイン成功");
     await refetch();
+
+    // ログイン成功時に/mypageに遷移
+    router.push("/mypage");
   };
 
   /**
@@ -103,6 +115,11 @@ export default function Home() {
   return (
     <main className="max-w-2xl mx-auto p-6 space-y-8">
       <h1 className="text-2xl font-bold">betterAuth 学習アプリ</h1>
+      <div className="pt-4">
+        <Link href="/mypage" className="underline">
+          マイページへ
+        </Link>
+      </div>
 
       {/* メッセージ表示エリア（成功・失敗メッセージ） */}
       {message && (
