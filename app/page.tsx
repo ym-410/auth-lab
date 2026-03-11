@@ -9,7 +9,7 @@ import { useState, useEffect } from "react";
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ModeToggle } from "@/app/components/mode-toggle";
+import { ModeToggle } from "@/components/mode-toggle";
 
 export default function Home() {
   // セッション情報を取得
