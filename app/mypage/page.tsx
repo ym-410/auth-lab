@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation"
+import { Note } from "@/types/note"
 
 export default function MyPage() {
   
