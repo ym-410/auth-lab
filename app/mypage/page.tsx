@@ -2,10 +2,14 @@
 
 import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
+import { useRouter } from "next/navigation"
 
 export default function MyPage() {
-  const { data: session, isPending } = authClient.useSession();
-
+  
+  const { data: session, isPending, refetch } = authClient.useSession();
+  // router
+  const router = useRouter();
+  
   if (isPending) {
     return <main className="p-6">読み込み中...</main>;
   }
@@ -16,6 +20,7 @@ export default function MyPage() {
         <h1 className="text-2xl font-bold">My Page</h1>
         <p>このページはログイン中のユーザー向けです。</p>
         <p>まだログインしていません。</p>
+
         <Link href="/" className="underline">
           トップページに戻る
         </Link>
@@ -23,20 +28,37 @@ export default function MyPage() {
     );
   }
 
+  const signOut = async () => {
+    await authClient.signOut();
+    await refetch();
+
+    // ログアウト成功時に/mypageに遷移
+    router.push("/");
+  };
+
   return (
     <main className="max-w-2xl mx-auto p-6 space-y-4">
       <h1 className="text-2xl font-bold">My Page</h1>
       <p>ログイン中です。</p>
+      {/*<Link href="/" className="underline">
+        トップページに戻る
+      </Link>
+      */}
 
       <div className="rounded border p-4 space-y-2">
         <p><span className="font-semibold">名前:</span> {session.user.name}</p>
         <p><span className="font-semibold">メール:</span> {session.user.email}</p>
         <p><span className="font-semibold">ユーザーID:</span> {session.user.id}</p>
       </div>
+        <button
+          onClick={signOut}
+          className="rounded border px-4 py-2"
+        >
+          ログアウト
+        </button>
+        
 
-      <Link href="/" className="underline">
-        トップページに戻る
-      </Link>
+      
     </main>
   );
 }

@@ -5,7 +5,7 @@
 "use client";
 
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -30,6 +30,12 @@ export default function Home() {
 
   // router
   const router = useRouter();
+
+  useEffect(() => {
+    if (!isPending && session) {
+      router.push("/mypage");
+    }
+  }, [isPending, session, router]);
 
   /**
    * 新規登録処理
@@ -119,11 +125,7 @@ export default function Home() {
         <h1 className="text-2xl font-bold">betterAuth 学習アプリ</h1>
         <ModeToggle />
       </div>
-      <div className="pt-4">
-        <Link href="/mypage" className="underline">
-          マイページへ
-        </Link>
-      </div>
+
 
       {/* メッセージ表示エリア（成功・失敗メッセージ） */}
       {message && (
@@ -132,25 +134,7 @@ export default function Home() {
         </p>
       )}
 
-      {/* セッションの有無で表示を切り替え */}
-      {session ? (
-        // ログイン済みの場合：マイページを表示
-        <section className="space-y-4 rounded border p-4">
-          <h2 className="text-xl font-semibold">マイページ</h2>
-          <p>ログイン中です。</p>
-          <p>名前: {session.user.name}</p>
-          <p>メール: {session.user.email}</p>
 
-          <button
-            onClick={handleSignOut}
-            className="rounded border px-4 py-2"
-          >
-            ログアウト
-          </button>
-        </section>
-      ) : (
-        // 未ログインの場合：新規登録とログインフォームを表示
-        <>
           {/* 新規登録セクション */}
           <section className="space-y-3 rounded border p-4">
             <h2 className="text-xl font-semibold">新規登録</h2>
@@ -204,8 +188,6 @@ export default function Home() {
               ログイン
             </button>
           </section>
-        </>
-      )}
     </main>
   );
 }
