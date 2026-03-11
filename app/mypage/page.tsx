@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation"
-import { Note } from "@/types/note"
+import NoteSection from "@/components/NoteSection";
 
 export default function MyPage() {
   
@@ -51,12 +51,14 @@ export default function MyPage() {
         <p><span className="font-semibold">メール:</span> {session.user.email}</p>
         <p><span className="font-semibold">ユーザーID:</span> {session.user.id}</p>
       </div>
-        <button
-          onClick={signOut}
-          className="rounded border px-4 py-2"
-        >
-          ログアウト
-        </button>
+
+      <NoteSection/>
+      <button
+        onClick={signOut}
+        className="rounded border px-4 py-2"
+      >
+        ログアウト
+      </button>
         
 
       

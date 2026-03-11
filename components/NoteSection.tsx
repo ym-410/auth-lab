@@ -1,13 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Note } from "@/types/note";
 
-type NoteSectionProps = {
-  isLoggedIn: boolean;
+type Note = {
+  id: string;
+  userId: string;
+  content: string;
+  createdAt: string;
+  updatedAt: string;
 };
 
-export default function NoteSection({ isLoggedIn }: NoteSectionProps) {
+export default function NoteSection() {
   const [content, setContent] = useState("");
   const [message, setMessage] = useState("");
   const [loadingNote, setLoadingNote] = useState(true);
@@ -26,10 +29,8 @@ export default function NoteSection({ isLoggedIn }: NoteSectionProps) {
       setLoadingNote(false);
     };
 
-    if (isLoggedIn) {
-      fetchNote();
-    }
-  }, [isLoggedIn]);
+    fetchNote();
+  }, []);
 
   const handleSave = async () => {
     setMessage("");
