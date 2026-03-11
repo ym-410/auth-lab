@@ -9,6 +9,7 @@ import { useState } from "react";
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { ModeToggle } from "@/app/components/mode-toggle";
 
 export default function Home() {
   // セッション情報を取得
@@ -56,7 +57,7 @@ export default function Home() {
     await refetch();
 
     router.push("/mypage");
-    
+
   };
 
   /**
@@ -114,7 +115,10 @@ export default function Home() {
 
   return (
     <main className="max-w-2xl mx-auto p-6 space-y-8">
-      <h1 className="text-2xl font-bold">betterAuth 学習アプリ</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold">betterAuth 学習アプリ</h1>
+        <ModeToggle />
+      </div>
       <div className="pt-4">
         <Link href="/mypage" className="underline">
           マイページへ
